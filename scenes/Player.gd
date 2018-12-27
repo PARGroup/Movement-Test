@@ -11,8 +11,8 @@ export var player1 = false
 onready var particles = $Particles
 
 var IDLING = State.new(Vector3(0, 0, 0), 0, Vector3(0, 0, 0), StateType.IDLING)
-var DASHING = State.new(Vector3(14, 0, 0), 0.25, Vector3(5, 0, 0), StateType.DASHING)
-var KNOCKBACK = State.new(Vector3(5, 0, 0), 0.1, Vector3(5, 0, 0), StateType.KNOCKED_BACK)
+var DASHING = State.new(Vector3(20, 0, 0), 0.1, Vector3(10, 0, 0), StateType.DASHING)
+var KNOCKBACK = State.new(Vector3(10, 0, 0), 0.1, Vector3(5, 0, 0), StateType.KNOCKED_BACK)
 
 var acceleration = Vector3()
 var velocity = Vector3()
@@ -85,7 +85,6 @@ func set_movement_state(state, movementScale):
 func hit(attacker, knockbackScale):
 	
 	particles.restart()
-	particles.set_emitting(true)
 	
 	set_movement_state(self.KNOCKBACK, knockbackScale)
 	
