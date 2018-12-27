@@ -9,10 +9,17 @@ extends KinematicBody
 export var player1 = false
 
 onready var particles = $Particles
+const DASH_VEL = 25;
+const DASH_SPD = 0.4;
+const DASH_ACL = 8;
+const KNOCKBACK_VEL = 10;
+const KNOCKBACK_SPD = 0.2;
+const KNOCKBACK_ACL = 5
 
 var IDLING = State.new(Vector3(0, 0, 0), 0, Vector3(0, 0, 0), StateType.IDLING)
-var DASHING = State.new(Vector3(20, 0, 0), 0.1, Vector3(10, 0, 0), StateType.DASHING)
-var KNOCKBACK = State.new(Vector3(10, 0, 0), 0.1, Vector3(5, 0, 0), StateType.KNOCKED_BACK)
+var DASHING = State.new(Vector3(DASH_VEL, 0, 0), DASH_SPD, Vector3(DASH_ACL, 0, 0), StateType.DASHING)
+var KNOCKBACK = State.new(Vector3(KNOCKBACK_VEL, 0, 0), KNOCKBACK_SPD, Vector3(KNOCKBACK_ACL, 0, 0), StateType.KNOCKED_BACK)
+
 
 var acceleration = Vector3()
 var velocity = Vector3()
