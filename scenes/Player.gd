@@ -52,16 +52,20 @@ func _physics_process(delta):
 	if player1:
 		if Input.is_action_just_pressed("player1_move_right"):
 			player1MoveRight = true
+			player1MoveLeft = false
 			inputCountdown = INPUT_RETENTION_TIME
 		elif Input.is_action_just_pressed("player1_move_left"):
 			player1MoveLeft = true
+			player1MoveRight = false
 			inputCountdown = INPUT_RETENTION_TIME
 	else:
 		if Input.is_action_just_pressed("player2_move_right"):
 			player2MoveRight = true
+			player2MoveLeft = false
 			inputCountdown = INPUT_RETENTION_TIME
 		elif Input.is_action_just_pressed("player2_move_left"):
 			player2MoveLeft = true
+			player2MoveRight = false
 			inputCountdown = INPUT_RETENTION_TIME
 
 	match currentState.stateType:
