@@ -12,7 +12,7 @@ onready var particles = $Particles
 
 var IDLING = State.new(Vector3(0, 0, 0), 0, Vector3(0, 0, 0), StateType.IDLING)
 var DASHING = State.new(Vector3(20, 0, 0), 0.1, Vector3(10, 0, 0), StateType.DASHING)
-var KNOCKBACK = State.new(Vector3(10, 0, 0), 0.05, Vector3(5, 0, 0), StateType.KNOCKED_BACK)
+var KNOCKBACK = State.new(Vector3(10, 0, 0), 0.1, Vector3(5, 0, 0), StateType.KNOCKED_BACK)
 
 var acceleration = Vector3()
 var velocity = Vector3()
