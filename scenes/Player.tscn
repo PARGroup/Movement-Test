@@ -162,7 +162,7 @@ subdivide_width = 0
 subdivide_height = 0
 subdivide_depth = 0
 
-[sub_resource type="Animation" id=8]
+[sub_resource type="Animation" id=7]
 
 resource_name = "attack-left"
 length = 0.25
@@ -181,9 +181,8 @@ tracks/0/keys = {
 "values": [ Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.22231, 0 ), Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.22231, -3 ) ]
 }
 
-[sub_resource type="Animation" id=7]
+[sub_resource type="Animation" id=8]
 
-resource_name = "attack-right"
 length = 0.25
 loop = false
 step = 0.1
@@ -275,8 +274,8 @@ autoplay = ""
 playback_process_mode = 1
 playback_default_blend_time = 0.0
 playback_speed = 1.0
-anims/attack-left = SubResource( 8 )
-anims/attack-right = SubResource( 7 )
+anims/attack-left = SubResource( 7 )
+anims/attack-right = SubResource( 8 )
 blend_times = [  ]
 
 
