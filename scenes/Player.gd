@@ -17,7 +17,7 @@ const KNOCKBACK_VEL = 10;
 const KNOCKBACK_SPD = 0.3;
 const KNOCKBACK_ACL = 5
 
-const LEAP_BACK_SCALE = 0.5
+const LEAP_BACK_SCALE = 0.65
 
 var IDLING = State.new(Vector3(0, 0, 0), 0, Vector3(0, 0, 0), StateType.IDLING)
 var DASHING = State.new(Vector3(DASH_VEL, 0, 0), DASH_SPD, Vector3(DASH_ACL, 0, 0), StateType.DASHING)
@@ -28,6 +28,7 @@ var velocity = Vector3()
 var movementScale = 0
 
 var currentState = self.IDLING
+var mat = load("res://Materials/Default.material")
 
 var stateTime = 0
 
@@ -107,7 +108,8 @@ func _physics_process(delta):
 		StateType.KNOCKED_BACK:
 			stateTime -= delta
 			move_and_slide(velocity, Vector3(0, 1, 0), 0.05, 2)
-		
+			mat = load("res://Materials/Damaged.material")
+			get_node("Player1").set_material_override(mat)
 	
 	if inputCountdown > 0:
 		
