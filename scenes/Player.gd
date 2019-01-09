@@ -109,7 +109,7 @@ func _physics_process(delta):
 			stateTime -= delta
 			move_and_slide(velocity, Vector3(0, 1, 0), 0.05, 2)
 			mat = load("res://Materials/Damaged.material")
-			get_node("Player1").set_material_override(mat)
+			get_node("MeshInstance").set_material_override(mat)
 	
 	if inputCountdown > 0:
 		
