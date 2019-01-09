@@ -10,14 +10,16 @@ export var player1 = false
 
 onready var particles = $Particles
 
-const DASH_VEL = 20;
-const DASH_SPD = 0.4;
-const DASH_ACL = 8;
-const KNOCKBACK_VEL = 10;
-const KNOCKBACK_SPD = 0.3;
-const KNOCKBACK_ACL = 5
+const DASH_VEL = 30;
+const DASH_SPD = 0.2;
+const DASH_ACL = 10;
+const KNOCKBACK_VEL = 15;
+const KNOCKBACK_SPD = 0.1;
+const KNOCKBACK_ACL = 8
 
 const LEAP_BACK_SCALE = 0.65
+
+const INPUT_RETENTION_TIME = 0.5
 
 var IDLING = State.new(Vector3(0, 0, 0), 0, Vector3(0, 0, 0), StateType.IDLING)
 var DASHING = State.new(Vector3(DASH_VEL, 0, 0), DASH_SPD, Vector3(DASH_ACL, 0, 0), StateType.DASHING)
@@ -33,8 +35,6 @@ var mat = load("res://Materials/Default.material")
 var stateTime = 0
 
 var health = 100
-
-const INPUT_RETENTION_TIME = 0.5
 
 var inputCountdown = 0
 
@@ -109,7 +109,7 @@ func _physics_process(delta):
 			stateTime -= delta
 			move_and_slide(velocity, Vector3(0, 1, 0), 0.05, 2)
 			mat = load("res://Materials/Damaged.material")
-			get_node("Player1").set_material_override(mat)
+			get_node("MeshInstance").set_material_override(mat)
 	
 	if inputCountdown > 0:
 		
