@@ -17,7 +17,7 @@ const KNOCKBACK_VEL = 15;
 const KNOCKBACK_SPD = 0.1;
 const KNOCKBACK_ACL = 8
 
-const LEAP_BACK_SCALE = 0.5
+const LEAP_BACK_SCALE = 0.65
 
 const INPUT_RETENTION_TIME = 0.5
 
@@ -30,6 +30,7 @@ var velocity = Vector3()
 var movementScale = 0
 
 var currentState = self.IDLING
+var mat = load("res://Materials/Default.material")
 
 var stateTime = 0
 
@@ -107,7 +108,8 @@ func _physics_process(delta):
 		StateType.KNOCKED_BACK:
 			stateTime -= delta
 			move_and_slide(velocity, Vector3(0, 1, 0), 0.05, 2)
-		
+			mat = load("res://Materials/Damaged.material")
+			get_node("Player1").set_material_override(mat)
 	
 	if inputCountdown > 0:
 		
