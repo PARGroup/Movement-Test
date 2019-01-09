@@ -82,7 +82,7 @@ points = PoolVector3Array( 1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, -1 )
 
 points = PoolVector3Array( 1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, -1 )
 
-[node name="Fight" type="Spatial"]
+[node name="Fight" type="Spatial" index="0"]
 
 [node name="Camera" type="Camera" parent="." index="0"]
 
