@@ -238,6 +238,7 @@ _sections_unfolded = [ "material" ]
 [node name="Particles" type="Particles" parent="." index="1"]
 
 transform = Transform( -1.62921e-007, 0, -1, 0, 1, 0, 1, 0, -1.62921e-007, 0, 2.4163, 0.0234002 )
+
 layers = 1
 material_override = null
 cast_shadow = 1
@@ -310,5 +311,4 @@ _sections_unfolded = [ "Transform", "Visibility" ]
 
 shape = SubResource( 9 )
 disabled = false
-
 
