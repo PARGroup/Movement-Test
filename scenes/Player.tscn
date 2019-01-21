@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [sub_resource type="CubeMesh" id=1]
 
@@ -31,7 +31,7 @@ params_point_size = 1.0
 params_billboard_mode = 0
 params_grow = false
 params_use_alpha_scissor = false
-albedo_color = Color( 0.226925, 0.617188, 0.171173, 1 )
+albedo_color = Color( 1, 1, 1, 1 )
 metallic = 0.0
 metallic_specular = 0.5
 metallic_texture_channel = 0
@@ -194,13 +194,17 @@ tracks/0/keys = {
 "values": [ Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.22231, 0 ), Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.22231, 3 ) ]
 }
 
-[sub_resource type="BoxShape" id=8]
-
-extents = Vector3( 1, 1.96027, 1 )
-
 [sub_resource type="BoxShape" id=9]
 
-extents = Vector3( 1.88807, 1, 1 )
+extents = Vector3( 3.23348, 1, 1 )
+
+[sub_resource type="BoxShape" id=10]
+
+extents = Vector3( 1, 1.95195, 1 )
+
+[sub_resource type="BoxShape" id=11]
+
+extents = Vector3( 1, 1.95888, 1 )
 
 [node name="Player" type="KinematicBody" index="0"]
 
@@ -238,7 +242,6 @@ _sections_unfolded = [ "material" ]
 [node name="Particles" type="Particles" parent="." index="1"]
 
 transform = Transform( -1.62921e-007, 0, -1, 0, 1, 0, 1, 0, -1.62921e-007, 0, 2.4163, 0.0234002 )
-
 layers = 1
 material_override = null
 cast_shadow = 1
@@ -277,14 +280,8 @@ anims/attack-left = SubResource( 6 )
 anims/attack-right = SubResource( 7 )
 blend_times = [  ]
 
-[node name="Hurtbox" type="CollisionShape" parent="." index="3"]
+[node name="Hitbox" type="Area" parent="." index="3"]
 
-shape = SubResource( 8 )
-disabled = false
-
-[node name="Hitbox" type="Area" parent="." index="4"]
-
-transform = Transform( 2, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0 )
 input_ray_pickable = false
 input_capture_on_drag = false
 space_override = 0
@@ -311,4 +308,39 @@ _sections_unfolded = [ "Transform", "Visibility" ]
 
 shape = SubResource( 9 )
 disabled = false
+
+[node name="Hurtbox" type="Area" parent="." index="4"]
+
+input_ray_pickable = false
+input_capture_on_drag = false
+space_override = 0
+gravity_point = false
+gravity_distance_scale = 0.0
+gravity_vec = Vector3( 0, -1, 0 )
+gravity = 9.8
+linear_damp = 0.1
+angular_damp = 1.0
+priority = 0.0
+monitoring = true
+monitorable = true
+collision_layer = 1
+collision_mask = 1
+audio_bus_override = false
+audio_bus_name = "Master"
+reverb_bus_enable = false
+reverb_bus_name = "Master"
+reverb_bus_amount = 0.0
+reverb_bus_uniformity = 0.0
+_sections_unfolded = [ "Audio Bus", "Collision", "Pause", "Reverb Bus", "Transform", "Visibility" ]
+
+[node name="Area" type="CollisionShape" parent="Hurtbox" index="0"]
+
+shape = SubResource( 10 )
+disabled = false
+
+[node name="CollisionShape" type="CollisionShape" parent="." index="5"]
+
+shape = SubResource( 11 )
+disabled = false
+
 

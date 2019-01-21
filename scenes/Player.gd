@@ -16,7 +16,8 @@ const DASH_ACL = 10;
 const KNOCKBACK_VEL = 15;
 const KNOCKBACK_TIME = 0.1;
 const KNOCKBACK_ACL = 8
-const ATTACK_TIME = 12
+const ATTACK_TIME = 0.3
+const BLOCK_TIME = 0.1
 
 const LEAP_BACK_SCALE = 0.65
 
@@ -24,11 +25,13 @@ const INPUT_RETENTION_TIME = 0.5
 
 var matDefault = load("res://Materials/Default.material")
 var matAttacking = load("res://Materials/Attacking.material")
+var matBlocking = load("res://Materials/Blocking.material")
 
 var IDLING = State.new(Vector3(0, 0, 0), 0, Vector3(0, 0, 0), StateType.IDLING, matDefault)
 var DASHING = State.new(Vector3(DASH_VEL, 0, 0), DASH_TIME, Vector3(DASH_ACL, 0, 0), StateType.DASHING, matDefault)
 var KNOCKBACK = State.new(Vector3(KNOCKBACK_VEL, 0, 0), KNOCKBACK_TIME, Vector3(KNOCKBACK_ACL, 0, 0), StateType.KNOCKED_BACK, matDefault)
 var ATTACKING = State.new(Vector3(0, 0, 0), ATTACK_TIME, Vector3(0, 0, 0), StateType.ATTACKING, matAttacking)
+var BLOCKING = State.new(Vector3(0, 0, 0), BLOCK_TIME, Vector3(0, 0, 0), StateType.BLOCKING, matBlocking)
 
 var acceleration = Vector3()
 var velocity = Vector3()
@@ -54,24 +57,62 @@ func _ready():
 
 func _physics_process(delta):
 	
+	var attackers = []
+	var test = get_node("Hurtbox").get_overlapping_areas()
+	for body in test:
+		if body.get_owner() != self && body.is_class("Area") && body.get_owner().is_attacking():
+			attackers.append(body.get_owner())
+	
 	if player1:
 		if Input.is_action_just_pressed("player1_move_right"):
-			player1MoveRight = true
-			player1MoveLeft = false
-			inputCountdown = INPUT_RETENTION_TIME
+			if(attackers.empty()):
+				player1MoveRight = true
+				player1MoveLeft = false
+				inputCountdown = INPUT_RETENTION_TIME
+			else:
+				set_state(self.BLOCKING)
+				for body in attackers:
+					if body.player1:
+						body.hit(self, -2)
+					else:
+						body.hit(self, 2)
 		elif Input.is_action_just_pressed("player1_move_left"):
-			player1MoveLeft = true
-			player1MoveRight = false
-			inputCountdown = INPUT_RETENTION_TIME
+			if(attackers.empty()):
+				player1MoveLeft = true
+				player1MoveRight = false
+				inputCountdown = INPUT_RETENTION_TIME
+			else:
+				set_state(self.BLOCKING)
+				for body in attackers:
+					if body.player1:
+						body.hit(self, -2)
+					else:
+						body.hit(self, 2)
 	else:
 		if Input.is_action_just_pressed("player2_move_right"):
-			player2MoveRight = true
-			player2MoveLeft = false
-			inputCountdown = INPUT_RETENTION_TIME
+			if(attackers.empty()):
+				player2MoveRight = true
+				player2MoveLeft = false
+				inputCountdown = INPUT_RETENTION_TIME
+			else:
+				set_state(self.BLOCKING)
+				for body in attackers:
+					if body.player1:
+						body.hit(self, -2)
+					else:
+						body.hit(self, 2)
 		elif Input.is_action_just_pressed("player2_move_left"):
-			player2MoveLeft = true
-			player2MoveRight = false
-			inputCountdown = INPUT_RETENTION_TIME
+			if(attackers.empty()):
+				player2MoveLeft = true
+				player2MoveRight = false
+				inputCountdown = INPUT_RETENTION_TIME
+			else:
+				set_state(self.BLOCKING)
+				for body in attackers:
+					if body.player1:
+						body.hit(self, -2)
+					else:
+						body.hit(self, 2)
 
 	match currentState.stateType:
 		StateType.IDLING:
@@ -101,7 +142,6 @@ func _physics_process(delta):
 			
 			for body in collisions:
 				if body != self && body.is_class("KinematicBody"): #change to specify players
-					print(body)
 					set_state(self.ATTACKING)
 			
 		StateType.ATTACKING:
@@ -113,9 +153,12 @@ func _physics_process(delta):
 				for body in collisions:
 					if body != self && body.is_class("KinematicBody"):
 						if body.player1:
-							body.hit(self, -1)
+							body.hit(self, -2)
 						else:
-							body.hit(self, 1)
+							body.hit(self, 2)
+			
+		StateType.BLOCKING:
+			stateTime -= delta
 			
 		StateType.KNOCKED_BACK:
 			stateTime -= delta
@@ -138,9 +181,8 @@ func _physics_process(delta):
 		stateTime = 0
 		set_state(self.IDLING)
 	
-
 func set_state(state):
-	
+	stateTime = state.time
 	currentState = state
 	get_node("MeshInstance").set_material_override(state.material)
 
@@ -150,7 +192,6 @@ func set_movement_state(state, movementScale):
 	
 	velocity = state.velocity * movementScale
 	acceleration = state.acceleration * movementScale
-	stateTime = state.time
 	set_state(state)
 
 func hit(attacker, knockbackScale):
@@ -159,6 +200,12 @@ func hit(attacker, knockbackScale):
 	
 	set_movement_state(self.KNOCKBACK, knockbackScale)
 	
+
+func is_attacking():
+	if currentState == self.ATTACKING:
+		return true
+	else:
+		return false
 
 class State:
 	
@@ -182,4 +229,5 @@ enum StateType {
 	KNOCKED_BACK,
 	STUNNED,
 	ATTACKING,
+	BLOCKING,
 }
