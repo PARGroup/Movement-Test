@@ -220,13 +220,15 @@ skeleton = NodePath("..")
 material/0 = ExtResource( 1 )
 _sections_unfolded = [ "Transform", "material" ]
 
-[node name="Player1" parent="." index="5" instance=ExtResource( 2 )]
+[node name="Players" type="Node" parent="." index="5"]
+
+[node name="Player1" parent="Players" index="0" instance=ExtResource( 2 )]
 
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 2.22231, 0 )
 script = ExtResource( 3 )
 player1 = true
 
-[node name="Player2" parent="." index="6" instance=ExtResource( 2 )]
+[node name="Player2" parent="Players" index="1" instance=ExtResource( 2 )]
 
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 2.22231, 0 )
 script = ExtResource( 3 )
