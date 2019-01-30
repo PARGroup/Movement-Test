@@ -82,7 +82,7 @@ points = PoolVector3Array( 1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, -1 )
 
 points = PoolVector3Array( 1, 0, 1, -1, 0, 1, 1, 0, -1, -1, 0, -1 )
 
-[node name="Fight" type="Spatial" index="0"]
+[node name="Fight" type="Spatial"]
 
 [node name="Camera" type="Camera" parent="." index="0"]
 
@@ -132,13 +132,14 @@ constant_angular_velocity = Vector3( 0, 0, 0 )
 
 [node name="CollisionShape" type="CollisionShape" parent="Floor/StaticBody" index="0"]
 
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.00797977 )
 shape = SubResource( 3 )
 disabled = false
 
 [node name="RightWall" type="MeshInstance" parent="." index="2"]
 
 editor/display_folded = true
-transform = Transform( -8.14603e-07, -1, 0, 5, -1.62921e-07, 0, 0, 0, 5, 20, 5, 0 )
+transform = Transform( -8.14603e-007, -1, 0, 5, -1.62921e-007, 0, 0, 0, 5, 20, 5, 0 )
 layers = 1
 material_override = null
 cast_shadow = 1
@@ -172,7 +173,7 @@ disabled = false
 [node name="LeftWall" type="MeshInstance" parent="." index="3"]
 
 editor/display_folded = true
-transform = Transform( -1.41065e-06, 1, 0, -5, -2.8213e-07, 0, 0, 0, 5, -20, 5, 0 )
+transform = Transform( -1.41065e-006, 1, 0, -5, -2.8213e-007, 0, 0, 0, 5, -20, 5, 0 )
 layers = 1
 material_override = null
 cast_shadow = 1
@@ -205,7 +206,7 @@ disabled = false
 
 [node name="BackWall" type="MeshInstance" parent="." index="4"]
 
-transform = Transform( 3.97987e-13, 2.8213e-07, 20, 5, -2.8213e-07, 8.85426e-20, 1.41065e-06, 1, -5.6426e-06, 0, 5, -5 )
+transform = Transform( 3.97987e-013, 2.8213e-007, 20, 5, -2.8213e-007, 8.85426e-020, 1.41065e-006, 1, -5.6426e-006, 0, 5, -5 )
 layers = 1
 material_override = null
 cast_shadow = 1
