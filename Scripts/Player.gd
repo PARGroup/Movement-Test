@@ -17,7 +17,7 @@ const KNOCKBACK_VEL = 15;
 const KNOCKBACK_TIME = 0.1;
 const KNOCKBACK_ACL = 8
 const ATTACK_TIME = 0.3
-const BLOCK_TIME = 0.1
+const BLOCK_TIME = 0.8
 
 const LEAP_BACK_SCALE = 0.65
 
@@ -45,92 +45,38 @@ var health = 100
 
 var inputCountdown = 0
 
-var player1MoveRight = false
-var player1MoveLeft = false
-
-var player2MoveLeft = false
-var player2MoveRight = false
+var MoveRight
+var MoveLeft
 
 func _ready():
+	if player1:
+		MoveRight = "player1_move_right"
+		MoveLeft = "player1_move_left"
+	else:
+		MoveRight = "player2_move_right"
+		MoveLeft = "player2_move_left"
+		
 	particles.set_emitting(false)
 	particles.set_one_shot(true)
 
 func _physics_process(delta):
 	
-	var attackers = []
-	var test = get_node("Hurtbox").get_overlapping_areas()
-	for body in test:
-		if body.get_owner() != self && body.is_class("Area") && body.get_owner().is_attacking():
-			attackers.append(body.get_owner())
-	
-	if player1:
-		if Input.is_action_just_pressed("player1_move_right"):
-			if(attackers.empty()):
-				player1MoveRight = true
-				player1MoveLeft = false
-				inputCountdown = INPUT_RETENTION_TIME
-			else:
-				set_state(self.BLOCKING)
-				for body in attackers:
-					if body.player1:
-						body.hit(self, -2)
-					else:
-						body.hit(self, 2)
-		elif Input.is_action_just_pressed("player1_move_left"):
-			if(attackers.empty()):
-				player1MoveLeft = true
-				player1MoveRight = false
-				inputCountdown = INPUT_RETENTION_TIME
-			else:
-				set_state(self.BLOCKING)
-				for body in attackers:
-					if body.player1:
-						body.hit(self, -2)
-					else:
-						body.hit(self, 2)
-	else:
-		if Input.is_action_just_pressed("player2_move_right"):
-			if(attackers.empty()):
-				player2MoveRight = true
-				player2MoveLeft = false
-				inputCountdown = INPUT_RETENTION_TIME
-			else:
-				set_state(self.BLOCKING)
-				for body in attackers:
-					if body.player1:
-						body.hit(self, -2)
-					else:
-						body.hit(self, 2)
-		elif Input.is_action_just_pressed("player2_move_left"):
-			if(attackers.empty()):
-				player2MoveLeft = true
-				player2MoveRight = false
-				inputCountdown = INPUT_RETENTION_TIME
-			else:
-				set_state(self.BLOCKING)
-				for body in attackers:
-					if body.player1:
-						body.hit(self, -2)
-					else:
-						body.hit(self, 2)
+	var attackers = get_attackers()
 
 	match currentState.stateType:
 		StateType.IDLING:
-			
-			if player1:
-				if player1MoveRight:
+			if Input.is_action_just_pressed(MoveRight):
+				if(attackers.empty()):
+					inputCountdown = INPUT_RETENTION_TIME
 					set_movement_state(self.DASHING, 1)
-					player1MoveRight = false
-				elif player1MoveLeft:
-					set_movement_state(self.DASHING, -1 * LEAP_BACK_SCALE)
-					player1MoveLeft = false
-			else:
-				if player2MoveRight:
-					set_movement_state(self.DASHING, 1 * LEAP_BACK_SCALE)
-					player2MoveRight = false
-				elif player2MoveLeft:
+				else:
+					set_state(self.BLOCKING)
+			elif Input.is_action_just_pressed(MoveLeft):
+				if(attackers.empty()):
+					inputCountdown = INPUT_RETENTION_TIME
 					set_movement_state(self.DASHING, -1)
-					player2MoveLeft = false
+				else:
+					set_state(self.BLOCKING)
 		
 		StateType.DASHING:
 			
@@ -152,13 +98,22 @@ func _physics_process(delta):
 			
 				for body in collisions:
 					if body != self && body.is_class("KinematicBody"):
-						if body.player1:
-							body.hit(self, -2)
+						if body.is_blocking():
+							if body.player1:
+								hit(body, 2)
+							else:
+								hit(body, -2)
 						else:
-							body.hit(self, 2)
+							if body.player1:
+								body.hit(self, -2)
+							else:
+								body.hit(self, 2)
+						
 			
 		StateType.BLOCKING:
 			stateTime -= delta
+			if get_attackers().size() == 0:
+				set_state(self.IDLING)
 			
 		StateType.KNOCKED_BACK:
 			stateTime -= delta
@@ -170,12 +125,6 @@ func _physics_process(delta):
 		
 		if inputCountdown <= 0:
 			inputCountdown = 0
-			
-			player1MoveRight = false
-			player1MoveLeft = false
-			
-			player2MoveLeft = false
-			player2MoveRight = false
 	
 	if stateTime <= 0:
 		stateTime = 0
@@ -201,8 +150,22 @@ func hit(attacker, knockbackScale):
 	set_movement_state(self.KNOCKBACK, knockbackScale)
 	
 
+func get_attackers():
+	var attackers = []
+	var test = get_node("Hurtbox").get_overlapping_areas()
+	for body in test:
+		if body.get_owner() != self && body.is_class("Area") && body.get_owner().is_attacking():
+			attackers.append(body.get_owner())
+	return attackers
+
 func is_attacking():
 	if currentState == self.ATTACKING:
+		return true
+	else:
+		return false
+		
+func is_blocking():
+	if currentState == self.BLOCKING:
 		return true
 	else:
 		return false
