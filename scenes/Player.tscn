@@ -198,7 +198,7 @@ tracks/0/keys = {
 
 [sub_resource type="BoxShape" id=8]
 
-extents = Vector3( 3.23348, 1, 1 )
+extents = Vector3( 0.929539, 1, 1 )
 
 [sub_resource type="BoxShape" id=9]
 
@@ -284,8 +284,9 @@ anims/attack-left = SubResource( 6 )
 anims/attack-right = SubResource( 7 )
 blend_times = [  ]
 
-[node name="Hitbox" type="Area" parent="." index="3"]
+[node name="HitboxRight" type="Area" parent="." index="3"]
 
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.93, 0, 0 )
 input_ray_pickable = false
 input_capture_on_drag = false
 space_override = 0
@@ -306,15 +307,49 @@ reverb_bus_enable = false
 reverb_bus_name = "Master"
 reverb_bus_amount = 0.0
 reverb_bus_uniformity = 0.0
-_sections_unfolded = [ "Transform", "Visibility" ]
+_sections_unfolded = [ "Audio Bus", "Collision", "Reverb Bus", "Transform", "Visibility" ]
 
-[node name="Area" type="CollisionShape" parent="Hitbox" index="0"]
+[node name="Area" type="CollisionShape" parent="HitboxRight" index="0"]
 
 shape = SubResource( 8 )
 disabled = false
+_sections_unfolded = [ "Transform", "Visibility" ]
 
-[node name="Hurtbox" type="Area" parent="." index="4"]
+[node name="HitboxLeft" type="Area" parent="." index="4"]
 
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.92, 0, 0 )
+visible = false
+input_ray_pickable = false
+input_capture_on_drag = false
+space_override = 0
+gravity_point = false
+gravity_distance_scale = 0.0
+gravity_vec = Vector3( 0, -1, 0 )
+gravity = 9.8
+linear_damp = 0.1
+angular_damp = 1.0
+priority = 0.0
+monitoring = true
+monitorable = true
+collision_layer = 1
+collision_mask = 1
+audio_bus_override = false
+audio_bus_name = "Master"
+reverb_bus_enable = false
+reverb_bus_name = "Master"
+reverb_bus_amount = 0.0
+reverb_bus_uniformity = 0.0
+_sections_unfolded = [ "Audio Bus", "Collision", "Reverb Bus", "Transform", "Visibility" ]
+
+[node name="Area" type="CollisionShape" parent="HitboxLeft" index="0"]
+
+shape = SubResource( 8 )
+disabled = false
+_sections_unfolded = [ "Transform", "Visibility" ]
+
+[node name="Hurtbox" type="Area" parent="." index="5"]
+
+editor/display_folded = true
 input_ray_pickable = false
 input_capture_on_drag = false
 space_override = 0
@@ -341,8 +376,9 @@ _sections_unfolded = [ "Audio Bus", "Collision", "Pause", "Reverb Bus", "Transfo
 
 shape = SubResource( 9 )
 disabled = false
+_sections_unfolded = [ "Transform" ]
 
-[node name="CollisionShape" type="CollisionShape" parent="." index="5"]
+[node name="CollisionShape" type="CollisionShape" parent="." index="6"]
 
 shape = SubResource( 10 )
 disabled = false

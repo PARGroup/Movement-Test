@@ -18,6 +18,7 @@ const KNOCKBACK_TIME = 0.1;
 const KNOCKBACK_ACL = 8
 const ATTACK_TIME = 0.3
 const BLOCK_TIME = 0.8
+const STUN_TIME = 1.2
 
 const LEAP_BACK_SCALE = 0.65
 
@@ -26,12 +27,14 @@ const INPUT_RETENTION_TIME = 0.5
 var matDefault = load("res://Materials/Default.material")
 var matAttacking = load("res://Materials/Attacking.material")
 var matBlocking = load("res://Materials/Blocking.material")
+var matStunned = load("res://Materials/Stunned.material")
 
 var IDLING = State.new(Vector3(0, 0, 0), 0, Vector3(0, 0, 0), StateType.IDLING, matDefault)
 var DASHING = State.new(Vector3(DASH_VEL, 0, 0), DASH_TIME, Vector3(DASH_ACL, 0, 0), StateType.DASHING, matDefault)
 var KNOCKBACK = State.new(Vector3(KNOCKBACK_VEL, 0, 0), KNOCKBACK_TIME, Vector3(KNOCKBACK_ACL, 0, 0), StateType.KNOCKED_BACK, matDefault)
 var ATTACKING = State.new(Vector3(0, 0, 0), ATTACK_TIME, Vector3(0, 0, 0), StateType.ATTACKING, matAttacking)
 var BLOCKING = State.new(Vector3(0, 0, 0), BLOCK_TIME, Vector3(0, 0, 0), StateType.BLOCKING, matBlocking)
+var STUNNED = State.new(Vector3(0, 0, 0), STUN_TIME, Vector3(0, 0, 0), StateType.STUNNED, matStunned)
 
 var acceleration = Vector3()
 var velocity = Vector3()
@@ -45,78 +48,87 @@ var health = 100
 
 var inputCountdown = 0
 
-var MoveRight
-var MoveLeft
+var moveRight
+var moveLeft
+
+onready var hitBoxRight = get_node("HitboxRight")
+onready var hitBoxLeft = get_node("HitboxLeft")
+onready var hurtBox = get_node("Hurtbox")
 
 func _ready():
 	if player1:
-		MoveRight = "player1_move_right"
-		MoveLeft = "player1_move_left"
+		moveRight = "player1_move_right"
+		moveLeft = "player1_move_left"
 	else:
-		MoveRight = "player2_move_right"
-		MoveLeft = "player2_move_left"
+		moveRight = "player2_move_right"
+		moveLeft = "player2_move_left"
 		
 	particles.set_emitting(false)
 	particles.set_one_shot(true)
 
 func _physics_process(delta):
+		
+	if stateTime != 0:
+		stateTime -= delta
 	
-	var attackers = get_attackers()
-
 	match currentState.stateType:
 		StateType.IDLING:
-			if Input.is_action_just_pressed(MoveRight):
-				if(attackers.empty()):
+			if Input.is_action_just_pressed(moveRight):
+				if(get_attackers("Left").empty()):
 					inputCountdown = INPUT_RETENTION_TIME
+					hitBoxRight.visible = true;
+					hitBoxRight.monitoring = true;
 					set_movement_state(self.DASHING, 1)
 				else:
 					set_state(self.BLOCKING)
-			elif Input.is_action_just_pressed(MoveLeft):
-				if(attackers.empty()):
+			elif Input.is_action_just_pressed(moveLeft):
+				if(get_attackers("Right").empty()):
 					inputCountdown = INPUT_RETENTION_TIME
+					hitBoxLeft.visible = true;
+					hitBoxLeft.monitoring = true;
 					set_movement_state(self.DASHING, -1)
 				else:
 					set_state(self.BLOCKING)
 		
 		StateType.DASHING:
-			
-			stateTime -= delta
 			velocity += acceleration * delta
 			move_and_slide(velocity, Vector3(0, 1, 0), 0.05, 2)
 			
-			var collisions = get_node("Hitbox").get_overlapping_bodies()
+			var collisions = get_enemy_collisions()
 			
 			for body in collisions:
 				if body != self && body.is_class("KinematicBody"): #change to specify players
 					set_state(self.ATTACKING)
 			
 		StateType.ATTACKING:
-			stateTime -= delta
 			
 			if stateTime <= 0:
-				var collisions = get_node("Hitbox").get_overlapping_bodies()
+				var collisions = get_enemy_collisions()
 			
 				for body in collisions:
 					if body != self && body.is_class("KinematicBody"):
-						if body.is_blocking():
-							if body.player1:
-								hit(body, 2)
-							else:
-								hit(body, -2)
+						if body.player1:
+							body.hit(self, -2)
 						else:
-							if body.player1:
-								body.hit(self, -2)
-							else:
-								body.hit(self, 2)
-						
+							body.hit(self, 2)
+			
+			# Feinting
+			if Input.is_action_just_pressed(moveRight) && !hitBoxRight.monitoring:
+				inputCountdown = INPUT_RETENTION_TIME
+				hitBoxLeft.visible = false;
+				hitBoxLeft.monitoring = false;
+				set_movement_state(self.DASHING, 0.5)
+			elif Input.is_action_just_pressed(moveLeft) &&!hitBoxLeft.monitoring:
+				inputCountdown = INPUT_RETENTION_TIME
+				hitBoxRight.visible = false;
+				hitBoxRight.monitoring = false;
+				set_movement_state(self.DASHING, -0.5)
 			
 		StateType.BLOCKING:
-			stateTime -= delta
-			if get_attackers().size() == 0:
-				set_state(self.IDLING)
+			if get_attackers("Right").size() == 0 && get_attackers("Left").size() == 0:
+				set_state(self.STUNNED)
 			
 		StateType.KNOCKED_BACK:
-			stateTime -= delta
 			move_and_slide(velocity, Vector3(0, 1, 0), 0.05, 2)
 	
 	if inputCountdown > 0:
@@ -128,6 +140,10 @@ func _physics_process(delta):
 	
 	if stateTime <= 0:
 		stateTime = 0
+		hitBoxRight.visible = false;
+		hitBoxRight.monitoring = false;
+		hitBoxLeft.visible = false;
+		hitBoxLeft.monitoring = false;
 		set_state(self.IDLING)
 	
 func set_state(state):
@@ -144,19 +160,29 @@ func set_movement_state(state, movementScale):
 	set_state(state)
 
 func hit(attacker, knockbackScale):
+	if currentState == self.BLOCKING:
+		attacker.hit(self, -knockbackScale)
+		set_state(self.IDLING)
+	else:
+		particles.restart()
+		set_movement_state(self.KNOCKBACK, knockbackScale)
 	
-	particles.restart()
-	
-	set_movement_state(self.KNOCKBACK, knockbackScale)
-	
-
-func get_attackers():
+func get_attackers(direction):
 	var attackers = []
-	var test = get_node("Hurtbox").get_overlapping_areas()
+	var test = hurtBox.get_overlapping_areas()
 	for body in test:
-		if body.get_owner() != self && body.is_class("Area") && body.get_owner().is_attacking():
+		if body.get_owner() != self && body.get_name() == ("Hitbox" + direction) && body.get_owner().is_attacking():
 			attackers.append(body.get_owner())
 	return attackers
+
+func get_enemy_collisions():
+	var collisions
+	if hitBoxLeft.monitoring:
+		collisions = hitBoxLeft.get_overlapping_bodies()
+	elif hitBoxRight.monitoring:
+		collisions = hitBoxRight.get_overlapping_bodies()
+	else: collisions = []
+	return collisions
 
 func is_attacking():
 	if currentState == self.ATTACKING:
